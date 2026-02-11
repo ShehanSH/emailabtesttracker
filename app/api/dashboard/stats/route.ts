@@ -29,7 +29,15 @@ export async function GET() {
     const allTests = abTestsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    })) as Array<{
+      id: string;
+      status?: string;
+      results?: {
+        versionA?: { ctr?: number };
+        versionB?: { ctr?: number };
+        winner?: "versionA" | "versionB" | null;
+      };
+    }>;
 
     const runningTests = allTests.filter((test) => test.status === "running");
     const completedTests = allTests.filter((test) => test.status === "completed");

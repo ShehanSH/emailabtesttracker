@@ -25,6 +25,9 @@ export async function POST(req: Request, context: Context) {
     }
 
     const template = templateDoc.data();
+    if (!template) {
+      return NextResponse.json({ error: "Template data missing" }, { status: 404 });
+    }
     if (template.userId !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

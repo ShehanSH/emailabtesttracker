@@ -18,6 +18,7 @@ interface Template {
   versions: Array<{
     id: string;
     versionNumber: string;
+    htmlContent?: string;
     createdAt: string;
     performanceMetrics: {
       opens: number;

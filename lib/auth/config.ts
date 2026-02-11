@@ -1,6 +1,6 @@
 import { cert } from "firebase-admin/app";
 import { compare } from "bcryptjs";
-import type { NextAuthConfig } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { adminDb } from "@/lib/firebase/admin";
@@ -69,7 +69,7 @@ const providers = [
       };
     },
   }),
-] as NonNullable<NextAuthConfig["providers"]>;
+] as NonNullable<NextAuthOptions["providers"]>;
 
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   providers.push(
@@ -81,7 +81,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   );
 }
 
-export const authConfig: NextAuthConfig = {
+export const authConfig: NextAuthOptions = {
   // Don't use adapter for Google OAuth - we'll handle it manually
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },

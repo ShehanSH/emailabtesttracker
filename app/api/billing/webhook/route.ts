@@ -3,16 +3,30 @@ import Stripe from "stripe";
 import { adminDb } from "@/lib/firebase/admin";
 import type { Plan } from "@/types/firestore";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-12-18.acacia",
-});
+function getStripeClient() {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    return null;
+  }
+
+  return new Stripe(secretKey, {
+    apiVersion: "2026-01-28.clover",
+  });
+}
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req: NextRequest) {
+  const stripe = getStripeClient();
   if (!webhookSecret) {
     return NextResponse.json(
       { error: "Stripe webhook secret not configured" },
+      { status: 500 }
+    );
+  }
+  if (!stripe) {
+    return NextResponse.json(
+      { error: "Stripe secret key not configured" },
       { status: 500 }
     );
   }
@@ -74,14 +88,16 @@ export async function POST(req: NextRequest) {
         if (!usersSnapshot.empty) {
           const userDoc = usersSnapshot.docs[0];
           const plan = subscription.metadata?.plan as Plan;
+          const renewsAtUnix = (subscription as Stripe.Subscription & { current_period_end?: number })
+            .current_period_end;
 
           await userDoc.ref.update({
             plan: plan || "free",
             subscription: {
               stripeId: customerId,
               status: subscription.status,
-              renewsAt: subscription.current_period_end
-                ? new Date(subscription.current_period_end * 1000)
+              renewsAt: typeof renewsAtUnix === "number"
+                ? new Date(renewsAtUnix * 1000)
                 : null,
             },
           });

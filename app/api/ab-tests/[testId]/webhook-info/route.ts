@@ -53,7 +53,7 @@ export async function GET(req: Request, context: Context) {
           title: "Manual Webhook",
           description: "Send POST requests to the webhook URL with this payload:",
           payload: {
-            eventType: "open" | "click",
+            eventType: "open",
             templateVersionId: "version-id-here",
             recipientEmail: "user@example.com",
             metadata: {},

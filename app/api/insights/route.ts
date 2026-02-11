@@ -22,7 +22,14 @@ export async function GET() {
     const allTests = completedTestsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    })) as Array<{
+      id: string;
+      results?: {
+        versionA?: { ctr?: number };
+        versionB?: { ctr?: number };
+        winner?: "versionA" | "versionB" | null;
+      };
+    }>;
 
     // Aggregate insights
     const insights = {

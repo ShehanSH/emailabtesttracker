@@ -4,9 +4,16 @@ import Stripe from "stripe";
 import { adminDb } from "@/lib/firebase/admin";
 import { PLAN_PRICING, type Plan } from "@/lib/plans";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-12-18.acacia",
-});
+function getStripeClient() {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    return null;
+  }
+
+  return new Stripe(secretKey, {
+    apiVersion: "2026-01-28.clover",
+  });
+}
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -25,8 +32,9 @@ export async function GET(req: NextRequest) {
   try {
     const pricing = PLAN_PRICING[plan];
     const priceId = process.env[`STRIPE_PRICE_ID_${plan.toUpperCase()}`];
+    const stripe = getStripeClient();
 
-    if (!priceId || !process.env.STRIPE_SECRET_KEY) {
+    if (!priceId || !stripe) {
       console.error(`Missing STRIPE_PRICE_ID_${plan.toUpperCase()} or STRIPE_SECRET_KEY in environment`);
       // Redirect back to pricing with error message instead of showing JSON error
       const url = new URL("/pricing", req.url);
