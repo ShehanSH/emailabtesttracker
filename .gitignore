@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local/generated project docs and setup notes
+/*.md
+
+# local env helper files
+envfile.txt
+envfile.txt.bak
+envfile.ps1
